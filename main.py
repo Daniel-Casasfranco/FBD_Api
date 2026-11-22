@@ -21,9 +21,9 @@ app.add_middleware(
 # TODO: conectarse al cluster Admonsis  
 # client = MongoClient("mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:808")
 
-client = MongoClient("mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:808")
+client = MongoClient("mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:8087")
 # TODO: conectarse a la base de datos Admonsis  
-db = client["isis2304"]
+db = client["ISIS2304"]
 
 
 @app.get("/")
@@ -60,7 +60,14 @@ def post_evento(bar_id: int, datos: dict):
     db['eventos'].insert_one(datos)
     return {'mensaje': 'Evento guardado'}
 
+@app.get('/bares/{bar_id}/comentarios')
+def get_comentarios(bar_id: int):
+    comentarios = list(db['comentarios_bares'].find({'bar_id': bar_id}, {"_id": 0}))
+    return comentarios
 
-# TODO: implementar POST /bares/{bar_id}/eventos  
-# Debe insertar el evento en la colección 'eventos'
-# Recuerde agregar bar_id y fecha_creacion al documento antes de insertar
+@app.post('/bares/{bar_id}/comentarios')
+def post_comentario(bar_id: int, datos: dict):
+    datos['bar_id'] = bar_id
+    datos['fecha'] = datetime.now().isoformat()
+    db['comentarios_bares'].insert_one(datos)
+    return {'mensaje': 'Comentario guardado'}
