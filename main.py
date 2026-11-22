@@ -16,13 +16,9 @@ app.add_middleware(
 #cd FBD_Api python -m uvicorn main:app --reload
 
 #os.environ para despliegue. Descomente cuando ya probó todo local. ``
-# MONGO_URI = "mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:808"
-#client = MongoClient(os.environ["MONGO_URI"])
-# TODO: conectarse al cluster Admonsis  
-# client = MongoClient("mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:808")
+client = MongoClient(os.environ["MONGO_URI"])
+#client = MongoClient("mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:808")
 
-client = MongoClient("mongodb://ISIS2304E04202620:PGIF4dCSCBGs@157.253.236.88:808")
-# TODO: conectarse a la base de datos Admonsis  
 db = client["isis2304"]
 
 
@@ -38,7 +34,7 @@ def get_proveedores():
 
 @app.get('/bares/{bar_id}/comentarios')
 def get_comentarios(bar_id: int):
-    comentarios = None  # TODO: completar
+    comentarios = list(db['comentarios'].find({'bar_id': bar_id}, {"_id": 0}))
     return comentarios
 
 @app.post('/bares/{bar_id}/comentarios')
@@ -59,8 +55,3 @@ def post_evento(bar_id: int, datos: dict):
     datos['fecha_creacion'] = datetime.now().isoformat()
     db['eventos'].insert_one(datos)
     return {'mensaje': 'Evento guardado'}
-
-
-# TODO: implementar POST /bares/{bar_id}/eventos  
-# Debe insertar el evento en la colección 'eventos'
-# Recuerde agregar bar_id y fecha_creacion al documento antes de insertar
